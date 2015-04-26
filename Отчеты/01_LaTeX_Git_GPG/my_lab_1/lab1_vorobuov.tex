@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[a4paper,12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
 
@@ -13,6 +13,10 @@
 
 \begin{document}
 \maketitle
+\clearpage
+\tableofcontents
+\clearpage
+
 \part[1]{Cистема верстки TEX и расширения LATEX}
 
 Файл .tex представляет из себя обычный текстовый файл содержащий макрокоманды текстовой разметки.
@@ -21,9 +25,10 @@
 
 Создаем в блокноте простой файл, включкющий в себя минимум строк(Рис 1).
 
-\begin{figure}
-\center
-\includegraphics{scr1}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.5\textwidth]{scr1}
 \caption{Простейший tex документ.}
 \end{figure}
 
