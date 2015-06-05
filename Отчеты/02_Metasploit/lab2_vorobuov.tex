@@ -1,0 +1,284 @@
+ \documentclass{article}
+ \usepackage[utf8]{inputenc}
+ \usepackage[russian]{babel}
+ 
+ \title{Лабораторные работы №4 \\ Курс: Защита информации}
+ \author{Воробьев Олег}
+ 
+ \ifx\pdfoutput\undefined
+ \usepackage{graphicx}
+ \else
+ \usepackage[pdftex]{graphicx}
+ \fi
+ 
+ \begin{document}
+ \maketitle
+ \clearpage
+ \tableofcontents
+ \clearpage
+ 
+ \section{Работа с утилитой nmap}
+ \subsection{Начальные настройки}
+	В ходе данной работы будут использоваться две виртуальные машины: одна для сканирования, другая- как цель для сканирования. Для сканирования используется система KAlI Linux с предустановленными утилитами. В качестве объекта для сканирования используется metasploitable. Обе эти системы запускаются в с настройками сети в режиме сетевого моста(Рис 1). 
+ \begin{figure}[h!]
+ \centering
+ \includegraphics[width =\linewidth]{scr1}
+ \caption{Настройки сети.}
+ \end{figure}
+ 
+	Благодаря таким настройкам, две виртуальные машины могут видеть друг друга в локальной сети. Это обезопасит дальнейшую работу с ними. С помощью команды ifconfig можно удостовериться что машины получили свои ip адреса для дальнейшей работы с ними(Рис 2).
+ \begin{figure}
+	 \centering
+	 \includegraphics[width =\linewidth]{scr2}
+	 \includegraphics[width =\linewidth]{scr3}
+	 \caption{IP адреса машин.}
+ \end{figure}
+ \clearpage
+ 
+ \subsection{Поиск активных портов}
+ Поиск активных хостов осушествляется с помощью следующей команды.
+ \begin{verbatim}
+ 	nmap -sn 192.168.1.0/24
+ \end{verbatim}
+ Эта команда просканирует локальную сеть на наличие открытых хостов и покажет все доступные для прозванивания IP адреса(Рис 3). Вот результат.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr4}
+ 	\caption{Список активных хостов.}
+ \end{figure}
+ 
+ Последние 2 адреса - это адреса виртуальных машин запущенных на данном компьютере. Адрес 192.168.1.19 это адрес metasploitable к которому мы будем обращаться в течении работы.
+ \clearpage
+ 
+ \subsection{Определить открытые порты}
+ Поиск открытых портов осушествляется с помощью следующей команды.
+ \begin{verbatim}
+ nmap -open 192.168.1.19
+ \end{verbatim}
+ Эта команда просканирует IP адрес на наличие открытых портов и покажет все доступные для прозванивания порты(Рис 4). Вот результат.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr5}
+ 	\caption{Список всех открытых портов по данному IP  адресу.}
+ \end{figure}
+ 
+ Стоит отметить что показываются только открытые порты на данном адресе. Для отображения всех портов следует использовать другую команду.
+ \begin{verbatim}
+ nmap -p 0-65536 192.158.1.19
+ \end{verbatim}
+ Обработка такого запроса анимает гораздо больше времени, чем предыдущего, так как программа обращается ко всем возможным портам по данному IP адресу.
+ \clearpage
+ 
+ \subsection{Определить версии портов}
+ Отображение версий портов осуществляется следующей командой.
+ \begin{verbatim}
+ nmap -sV 192.168.1.19
+ \end{verbatim}
+ Результат обработки такого запроса представлен на рисунке 5.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr6}
+ 	\caption{Список открытых портов с версиями сервисов.}
+ \end{figure}
+ \clearpage
+ \subsection{Изучить файлы nmap-services, nmap-os-db,nmap-service-probes}
+ Файл nmap-services содержит набор наиболее часто используемых портов и сервисов на них. Подключение этого файла к процессу сканирования позволяет ускорить обработку команды, так как опрос будет проводиться не по всем 65536 портам а только потем, которые указаны в файле. Содержимое файла представлено на рисунке 6.
+ 
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr7}
+ 	\caption{Содержимое файла nmap-servives.}
+ \end{figure}
+ 
+ Этот файл задействуется с помощью опции -F. Выглядит это примерно так.
+ \begin{verbatim}
+ nmap -F 192.168.1.19
+ \end{verbatim}
+ \clearpage
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr8}
+ 	\caption{Результат работы nmap c опцией -F.}
+ \end{figure}
+
+ Как видно на рисунке 7, результат не на много, но все же быстрее обычного.
+ 
+ Файл nmap-os-db содержит слепки откликов различных операционных систем на запрос nmap. Благодаря этому файлу утилита может распознавать различные операционные системы с которыми она в данный момент работает. 
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr9}
+ 	\caption{Содержимое файла nmap-os-db.}
+ \end{figure}
+ \clearpage
+ Для задействования этого файла используется опция -О. Команда выглядит так
+ \begin{verbatim}
+ nmap -O 192.168.1.19
+ \end{verbatim}
+ 
+ В результате работы помимо информации о портах так же выводится информация о опрашиваемой системе.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr10}
+ 	\caption{Дополнительный вывод утилиты.}
+ \end{figure}
+ 
+ База данных nmap-service-probes содержит запросы для обращения к различным службам и соответствующие выражения для распознавания и анализа ответов.
+  
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr11}
+ 	\caption{Содержимое файла nmap-service-probes.}
+ \end{figure} 
+ \clearpage
+ 
+ \subsection{Добавить новую сигнатуру службы в файл nmap-service-probes}
+ 
+ Для наглядной демонстрации работы файла nmap service probes запустим примитивный TCP сервер на порте 10100. 
+ 
+ Просканировав даный порт с помошью nmap мы увидим что его поле сервиса не заполнено.
+  \begin{figure}[h!]
+  	\centering
+  	\includegraphics[width =\linewidth]{scr12}
+  	\caption{Сканирование порта 10100 без изменения файла.}
+  \end{figure}
+  
+  Теперь отредактируем файл nmap service probes. Добавим в него следующие строки:
+  \begin{figure}[h!]
+  	\centering
+  	\includegraphics[width =\linewidth]{scr13}
+  	\caption{Внесенные изменения в файл nmap service probes.}
+  \end{figure}
+ 
+ 
+ Если построчно то мы делаем следующее:
+ \begin{itemize}
+ 	\item создаем новый запрос TCP MYPROBE
+ 	\item прикрепляем запрос к порту 10100
+ 	\item в случае если получен ответ "this is my server" то система распознает наш сервер 
+ \end{itemize}
+ 
+ Теперь запустим утилиту еще раз но уже с обновленным файлом.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr14}
+ 	\caption{Обновленный вывод утилиты.}
+ \end{figure}
+ Как видно, система распознала наш сервер и вместо сервиса unknown тереь указан tcp.
+ 
+ \subsection{Сохранить вывод утилиты в XML}
+ 
+ Сохранение вывода утилиты в формате xml  осуществляется всего командой:
+ \begin{verbatim}
+ 	nmap -sV -oX -some_output 192.168.1.4
+ \end{verbatim}
+ 
+ \subsection{Исследовать работу nmap  с применением WIRESHARK}
+ Проанализируем с помошью wireshark каким путем nmap работает с компьютером.
+ 
+  \begin{figure}[h!]
+  	\centering
+  	\includegraphics[width =\linewidth]{scr15}
+  	\caption{Демонстрация работы nmap в Wireshark.}
+  \end{figure}
+  
+  Как видно из скриншота утилита устанавливает TCP соединения со всеми портами и анализирует ответы на эти запросы.
+ 
+ \subsection{Просканировать виртуальную утилиту Metasploitable2 используя db nmap из состава metasploit framework.\\}
+ 
+ Предварительно необходимо включить postgresql и metasploit
+ \begin{verbatim}
+ 	service postgresql start
+ 	service metasploit start
+ 	msfconsole
+ \end{verbatim}
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr16}
+ 	\caption{Подключение.}
+ \end{figure}
+ 
+ Затем запускаем команду
+  \begin{verbatim}
+  db_nmap -v -sV 192.168.124.211
+  \end{verbatim}
+  Результат сканирования приведен на рисунке ниже.
+  
+ \subsection{Рассмотрите один скрипт из состава NMAP.\\}
+ Рассмотрим скрипт auth-spoof.nse
+ \begin{verbatim}
+ 	local comm = require "comm"
+ 	local shortport = require "shortport"
+ 	
+ 	description = [[
+ 	Checks for an identd (auth) server which is spoofing its replies.
+ 	
+ 	Tests whether an identd (auth) server responds with an answer before
+ 	we even send the query.  This sort of identd spoofing can be a sign of
+ 	malware infection, though it can also be used for legitimate privacy
+ 	reasons.
+ 	]]
+ 	
+ 	---
+ 	-- @output
+ 	-- PORT    STATE SERVICE REASON
+ 	-- 113/tcp open  auth    syn-ack
+ 	-- |_auth-spoof: Spoofed reply: 0, 0 : USERID : UNIX : OGJdvM
+ 	
+ 	author = "Diman Todorov"
+ 	
+ 	license = "Same as Nmap--See http://nmap.org/book/man-legal.html"
+ 	
+ 	categories = {"malware", "safe"}
+ 	
+ 	
+ 	portrule = shortport.port_or_service(113, "auth")
+ 	
+ 	action = function(host, port)
+ 	local status, owner = comm.get_banner(host, port, {lines=1})
+ 	
+ 	if not status then
+ 	return
+ 	end
+ 	
+ 	return "Spoofed reply: " .. owner
+ 	end
+ \end{verbatim}
+  
+  Сначала объявляются переменные.
+  \begin{verbatim}
+  	local comm = require "comm"
+  	local shortport = require "shortport"
+  \end{verbatim}
+  
+  Затем соледует описание скрипта.
+  \begin{verbatim}
+  		description = [[
+  		Checks for an identd (auth) server which is spoofing its replies.
+  		
+  		Tests whether an identd (auth) server responds with an answer before
+  		we even send the query.  This sort of identd spoofing can be a sign of
+  		malware infection, though it can also be used for legitimate privacy
+  		reasons.
+  		]]
+  \end{verbatim}
+  
+  Затем идет правило порта. Эта функция возвращет true если ответ совпал с правилом и false если нет.
+  \begin{verbatim}
+  	portrule = shortport.port_or_service(113, "auth")
+  \end{verbatim}
+  
+  Затем описано действие.
+  \begin{verbatim}
+  	action = function(host, port)
+  	local status, owner = comm.get_banner(host, port, {lines=1})
+  	
+  	if not status then
+  	return
+  	end
+  \end{verbatim}
+  
+  Данный скрипт просто проверяет отклик порта, перед началом работы с ним.
+  
+  \section{Вывод}
+  В ходе данной работы были изучены основные приемы работы с nmap, wireshark и metasploit. Nmap является многогранным инструментом для сбора информации о компьютере. Это может стать хорошим подспольем в подготовке атаки или в анализе слабых мест машины.
+ \end{document}
